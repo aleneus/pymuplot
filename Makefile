@@ -19,3 +19,7 @@ lint-e:
 
 cover:
 	@nose2 --with-coverage --coverage-report=html
+
+upload:
+	python3 setup.py sdist
+	python3 -m twine upload --repository pypi dist/*
