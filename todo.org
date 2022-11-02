@@ -2,6 +2,7 @@
 ** DONE other: + pylintrc
 ** DONE other: + requirements.txt
 ** DONE other: update pyqtgraph
+** DONE docs: update years in licence
 * later
 ** TODO ref: phasor: check if key duplicated
 ** TODO feat: pyqtgraph: new widget for waveforms
