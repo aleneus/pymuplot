@@ -12,7 +12,6 @@
 
 # You should have received a copy of the Lesser GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """Waveform widgets."""
 
 import time
@@ -33,28 +32,22 @@ class TimeStampAxisItem(pg.AxisItem):
 
     def tickStrings(self, values, scale, spacing):
         if self.what_show == 'time':
-            return [time.strftime("%H:%M:%S", time.gmtime(secs))
-                    for secs in values]
+            return [
+                time.strftime("%H:%M:%S", time.gmtime(secs)) for secs in values
+            ]
         if self.what_show == 'date':
-            return [time.strftime("%y-%m-%d", time.gmtime(secs))
-                    for secs in values]
+            return [
+                time.strftime("%y-%m-%d", time.gmtime(secs)) for secs in values
+            ]
         raise RuntimeError("scale must be time or date")
 
 
 def get_time_stamp_axis_item(top=True):
     """Return custom axis item with time stamps."""
 
-    res = {
-        'bottom': TimeStampAxisItem(
-            what_show='time',
-            orientation='bottom'
-        )
-    }
+    res = {'bottom': TimeStampAxisItem(what_show='time', orientation='bottom')}
     if top:
-        res['top'] = TimeStampAxisItem(
-            what_show='date',
-            orientation='top'
-        )
+        res['top'] = TimeStampAxisItem(what_show='date', orientation='top')
     return res
 
 
@@ -158,11 +151,9 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
         """Set the plot used for synchronization (main plot)."""
         return self._main
 
-    main_plot = property(
-        get_main_plot,
-        set_main_plot,
-        doc="Plot used for synchronization"
-    )
+    main_plot = property(get_main_plot,
+                         set_main_plot,
+                         doc="Plot used for synchronization")
 
     def _init_plot(self, key):
         """Bring plot to initial state."""
@@ -174,10 +165,8 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
         plot.showAxis('top')
         plot.showAxis('right')
         for axis in ['left', 'right']:
-            plot.getAxis(axis).setStyle(
-                tickTextWidth=40,
-                autoExpandTextSpace=False
-            )
+            plot.getAxis(axis).setStyle(tickTextWidth=40,
+                                        autoExpandTextSpace=False)
         plot.enableAutoRange(True)
 
     def add_plot(self, key, title=None, time_axes=False):

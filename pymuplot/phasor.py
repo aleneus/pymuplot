@@ -12,7 +12,6 @@
 
 # You should have received a copy of the Lesser GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """Here the different types of phasor diagrams are implemented."""
 
 from math import degrees
@@ -20,7 +19,7 @@ from warnings import warn
 import cmath
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtWidgets, QtGui
-
+from pyqtgraph.Qt.QtWidgets import QGraphicsEllipseItem
 
 DEFAULT_WIDGET_SIZE = QtCore.QSize(500, 500)
 DEFAULT_COLOR = (255, 255, 255)
@@ -29,6 +28,7 @@ DEFAULT_WIDTH = 1
 
 class Arrow:
     """Arrow to be plotted."""
+
     def __init__(self, line, end, name=None):
         self.line = line
         self.end = end
@@ -50,7 +50,7 @@ class Arrow:
         else:
             if self.visible:
                 self.end.setVisible(True)
-            compl = cmath.rect(amp_scale*amp, phi)
+            compl = cmath.rect(amp_scale * amp, phi)
             x = compl.real
             y = compl.imag
 
@@ -66,6 +66,7 @@ class Arrow:
 
 class BasePhasorDiagram(pg.PlotWidget):
     """Base class for phasor diagrams."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -97,8 +98,8 @@ class BasePhasorDiagram(pg.PlotWidget):
 
         self._legend = self.plotItem.addLegend()
         for key in self._arrows:
-            self.plotItem.legend.addItem(
-                self._arrows[key].line, self.__build_name(key))
+            self.plotItem.legend.addItem(self._arrows[key].line,
+                                         self.__build_name(key))
             self.plotItem.legend.setColumnCount(self.__legend_cols())
 
     def _to_front(self, item):
@@ -155,7 +156,7 @@ class PhasorDiagram(BasePhasorDiagram):
     def __init_grid(self):
         self.__circles = []
         for _ in range(CIRCLES_NUM):
-            circle = pg.QtGui.QGraphicsEllipseItem()
+            circle = QGraphicsEllipseItem()
             circle.setPen(pg.mkPen(0.2))
             self.__circles.append(circle)
             self.addItem(circle)
@@ -237,10 +238,11 @@ class PhasorDiagram(BasePhasorDiagram):
     def __update_grid(self):
         for i in range(CIRCLES_NUM):
             rad = (i + 1) * self.__range / CIRCLES_NUM
-            self.__circles[i].setRect(-rad, -rad, rad*2, rad*2)
+            self.__circles[i].setRect(-rad, -rad, rad * 2, rad * 2)
 
-        self.setRange(QtCore.QRectF(-self.__range, self.__range,
-                                    2*self.__range, -2*self.__range))
+        self.setRange(
+            QtCore.QRectF(-self.__range, self.__range, 2 * self.__range,
+                          -2 * self.__range))
 
     def __update_labels(self):
         for i in range(LABELS_NUM):
@@ -250,8 +252,7 @@ class PhasorDiagram(BasePhasorDiagram):
 
     def update_phasor(self, key, amp, phi):
         """Deprecated."""
-        warn("update_phasor() is deprecated, use update_data()",
-             FutureWarning)
+        warn("update_phasor() is deprecated, use update_data()", FutureWarning)
         self.update_data(key, amp, phi)
 
     def set_phasor_visible(self, key, value=True):
@@ -267,15 +268,18 @@ class PhasorDiagram(BasePhasorDiagram):
 
 
 DEFAULT_MIN_RANGE = 0.001
-I_SCALE = 2/3
+I_SCALE = 2 / 3
 ROUND_TO = 3
 TEXT_FONT_SIZE = 14
 
 
 class PhasorDiagramUI(BasePhasorDiagram):
     """Phasor diagram with two scales: for voltage and current phasors."""
-    def __init__(self, parent=None,
-                 auto_range=True, min_range=DEFAULT_MIN_RANGE):
+
+    def __init__(self,
+                 parent=None,
+                 auto_range=True,
+                 min_range=DEFAULT_MIN_RANGE):
         super().__init__(parent)
 
         self.__min_range = min_range
@@ -296,7 +300,7 @@ class PhasorDiagramUI(BasePhasorDiagram):
     def __init_grid(self):
         self.__circles = {}
         for quant in ['u', 'i']:
-            self.__circles[quant] = pg.QtGui.QGraphicsEllipseItem()
+            self.__circles[quant] = QGraphicsEllipseItem()
             self.__circles[quant].setPen(pg.mkPen(0.2))
             self.addItem(self.__circles[quant])
 
@@ -415,11 +419,11 @@ class PhasorDiagramUI(BasePhasorDiagram):
     def __update_grid(self):
         self.__circles['u'].setRect(*self.__u_rect())
         rad = self.__i_radius()
-        self.__circles['i'].setRect(-rad, -rad, 2*rad, 2*rad)
+        self.__circles['i'].setRect(-rad, -rad, 2 * rad, 2 * rad)
 
     def __u_rect(self):
         u_radius = self.__range['u']
-        return (-u_radius, -u_radius, 2*u_radius, 2*u_radius)
+        return (-u_radius, -u_radius, 2 * u_radius, 2 * u_radius)
 
     def __update_labels(self):
         for quant in ['u', 'i']:
@@ -437,11 +441,10 @@ class PhasorDiagramUI(BasePhasorDiagram):
 
 
 def _end_item(color, width):
-    return pg.ArrowItem(
-        tailLen=0,
-        tailWidth=1,
-        pen=pg.mkPen(color, width=width),
-        headLen=width+4)
+    return pg.ArrowItem(tailLen=0,
+                        tailWidth=1,
+                        pen=pg.mkPen(color, width=width),
+                        headLen=width + 4)
 
 
 def _linestyle_to_dash(style, width):

@@ -8,7 +8,7 @@ test:
 	@nose2 -vvv --with-coverage
 
 todo:
-	@rgrep "TODO" --include="*py" || true
+	@rgrep "TODO" --include="*py" --exclude-dir="env" || true
 	@rgrep "# REF" --include="*py" || true
 
 flake:
