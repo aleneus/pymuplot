@@ -5,4 +5,4 @@ nose2-cov
 pylint
 yapf
 pyqtest>=0.1.1
-pyqtgraph>=0.12.4
+pyqtgraph>=0.13.1
