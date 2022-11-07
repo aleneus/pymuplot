@@ -15,7 +15,6 @@
 """Here the different types of phasor diagrams are implemented."""
 
 from math import degrees
-from warnings import warn
 import cmath
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtWidgets, QtGui
@@ -50,13 +49,12 @@ class Arrow:
         else:
             if self.visible:
                 self.end.setVisible(True)
-            compl = cmath.rect(amp_scale * amp, phi)
-            x = compl.real
-            y = compl.imag
 
-            self.line.setData([0, x], [0, y])
+            compl = cmath.rect(amp_scale * amp, phi)
+
+            self.line.setData([0, compl.real], [0, compl.imag])
             self.end.setStyle(angle=180 - degrees(phi))
-            self.end.setPos(x, y)
+            self.end.setPos(compl.real, compl.imag)
 
     def remove_from(self, widget):
         """Remove items from figure."""
@@ -97,9 +95,9 @@ class BasePhasorDiagram(pg.PlotWidget):
             return
 
         self._legend = self.plotItem.addLegend()
-        for key in self._arrows:
-            self.plotItem.legend.addItem(self._arrows[key].line,
-                                         self.__build_name(key))
+
+        for key, arrow in self._arrows.items():
+            self.plotItem.legend.addItem(arrow.line, self.__build_name(key))
             self.plotItem.legend.setColumnCount(self.__legend_cols())
 
     def _to_front(self, item):
@@ -108,18 +106,19 @@ class BasePhasorDiagram(pg.PlotWidget):
 
     def __build_name(self, key):
         if not self._arrows[key].name:
-            return "{}".format(key)
+            return f'{key}'
+
         return self._arrows[key].name
 
     def __legend_cols(self):
         return 1 + (len(self._arrows) - 1) // 10
 
     def sizeHint(self):
-        # pylint: disable=invalid-name,no-self-use,missing-docstring
+        # pylint: disable=invalid-name,missing-docstring
         return DEFAULT_WIDGET_SIZE
 
     def heightForWidth(self, width):
-        # pylint: disable=invalid-name,no-self-use,missing-docstring
+        # pylint: disable=invalid-name,missing-docstring
         return width
 
 
@@ -137,11 +136,8 @@ class PhasorDiagram(BasePhasorDiagram):
         Parent object
     """
 
-    def __init__(self, parent=None, size=None, end=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-
-        _depr_arg(size, "size arg is deprecated and ignored")
-        _depr_arg(end, "end arg is deprecated and ignored")
 
         self.__init_data()
         self.__init_grid()
@@ -226,8 +222,8 @@ class PhasorDiagram(BasePhasorDiagram):
     def remove_phasors(self):
         """Remove all phasors and legend."""
 
-        for key in self._arrows:
-            self._arrows[key].remove_from(self)
+        for arrow in self._arrows.values():
+            arrow.remove_from(self)
 
         if self._legend is not None:
             self._legend.clear()
@@ -247,24 +243,8 @@ class PhasorDiagram(BasePhasorDiagram):
     def __update_labels(self):
         for i in range(LABELS_NUM):
             value = (i + 1) * self.__range / LABELS_NUM
-            self.__labels[i].setText("{}".format(value))
+            self.__labels[i].setText(f'{value}')
             self.__labels[i].setPos(0, value)
-
-    def update_phasor(self, key, amp, phi):
-        """Deprecated."""
-        warn("update_phasor() is deprecated, use update_data()", FutureWarning)
-        self.update_data(key, amp, phi)
-
-    def set_phasor_visible(self, key, value=True):
-        """Deprecated."""
-        warn("set_phasor_visible() is deprecated, use set_visible()",
-             FutureWarning)
-        self.set_visible(key, value)
-
-    def show_legend(self):
-        """Show legend."""
-        warn("show_legend() is deprecated, use add_legend()", FutureWarning)
-        self.add_legend()
 
 
 DEFAULT_MIN_RANGE = 0.001
@@ -340,8 +320,8 @@ class PhasorDiagramUI(BasePhasorDiagram):
 
     def remove_phasors(self):
         """Remove all phasors and legend."""
-        for key in self._arrows:
-            self._arrows[key].remove_from(self)
+        for arrow in self._arrows.values():
+            arrow.remove_from(self)
 
         if self._legend is not None:
             self._legend.clear()
@@ -369,7 +349,7 @@ class PhasorDiagramUI(BasePhasorDiagram):
 
     def __add_phasor(self, key, name=None, **kwargs):
         if key in self._arrows:
-            raise ValueError("repeated key: {}".format(key))
+            raise ValueError(f'repeated key: {key}')
 
         color = _val_if_none(kwargs.get('color'), DEFAULT_COLOR)
         width = _val_if_none(kwargs.get('width'), DEFAULT_WIDTH)
@@ -427,8 +407,8 @@ class PhasorDiagramUI(BasePhasorDiagram):
 
     def __update_labels(self):
         for quant in ['u', 'i']:
-            self.__labels[quant].setText("{}".format(
-                round(self.__range[quant], ROUND_TO)))
+            self.__labels[quant].setText(
+                f"{round(self.__range[quant], ROUND_TO)}")
 
         self.__labels['u'].setPos(0, self.__range['u'])
         self.__labels['i'].setPos(0, self.__i_radius())
@@ -462,8 +442,3 @@ def _linestyle_to_dash(style, width):
 
 def _val_if_none(var1, var2):
     return var1 if var1 is not None else var2
-
-
-def _depr_arg(arg, msg):
-    if arg is not None:
-        warn(msg, FutureWarning)

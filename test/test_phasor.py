@@ -12,6 +12,7 @@ setConfigOption("antialias", True)
 
 
 class TestPhasorDiagram(unittest.TestCase):
+
     def setUp(self):
         self.app = TestApp(self)
 
@@ -22,8 +23,9 @@ class TestPhasorDiagram(unittest.TestCase):
         d.add_phasor(1, amp=80, phi=1, color=(255, 0, 0))
         d.update_data(1, 80, 2)
 
-        self.app(d, ["White phasor in first quadrant",
-                     "Red phasor in second quadrant"])
+        self.app(d, [
+            "White phasor in first quadrant", "Red phasor in second quadrant"
+        ])
 
     def test_range_is_two(self):
         d = PhasorDiagram()
@@ -39,16 +41,15 @@ class TestPhasorDiagram(unittest.TestCase):
     def test_legend(self):
         d = PhasorDiagram()
         d.add_phasor('ph-1', amp=80, phi=0, color=(255, 0, 0), width=3)
-        d.add_phasor('ph-3', amp=80, phi=-2*3.14/3, color=(0, 0, 255))
+        d.add_phasor('ph-3', amp=80, phi=-2 * 3.14 / 3, color=(0, 0, 255))
         d.add_legend()
         d.set_range(80)
-        self.app(d, ["Legend OK",
-                     "Lines in legend have different widths"])
+        self.app(d, ["Legend OK", "Lines in legend have different widths"])
 
     def test_legend_prefer_name(self):
         d = PhasorDiagram()
         d.add_phasor(0, amp=80, phi=0, color=(255, 0, 0), name="Ua")
-        d.add_phasor(1, amp=80, phi=2*3.14/3, color=(0, 255, 0))
+        d.add_phasor(1, amp=80, phi=2 * 3.14 / 3, color=(0, 255, 0))
         d.add_legend()
         d.set_range(80)
         self.app(d, ["Legend: Ua, 1"])
@@ -91,8 +92,7 @@ class TestPhasorDiagram(unittest.TestCase):
         d.set_visible(2, True)
         d.set_visible(3, False)
 
-        self.app(d, ["2 phasors in diagram",
-                     "3 items in legend"])
+        self.app(d, ["2 phasors in diagram", "3 items in legend"])
 
     def test_all_styles(self):
         d = PhasorDiagram()
@@ -111,8 +111,7 @@ class TestPhasorDiagram(unittest.TestCase):
         d.set_range(2)
         d.add_legend()
 
-        self.app(d, ["Phasors of different styles",
-                     "Legend OK"])
+        self.app(d, ["Phasors of different styles", "Legend OK"])
 
     def test_scale_dashed(self):
         d = PhasorDiagram()
@@ -133,6 +132,7 @@ class TestPhasorDiagram(unittest.TestCase):
 
 
 class TestPhasorDiagram_Animation(unittest.TestCase):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.counter = 0
@@ -161,11 +161,11 @@ class TestPhasorDiagram_Animation(unittest.TestCase):
         self.counter = 0
         timer.start()
 
-        app(d, ["Phasors smoothly rotating",
-                "Amplitude of red phasor grows"])
+        app(d, ["Phasors smoothly rotating", "Amplitude of red phasor grows"])
 
 
 class TestPhasorDiagram_Smoke(unittest.TestCase):
+
     def test_fast_update_data_and_range(self):
         app = TestApp(self)
 
@@ -179,9 +179,9 @@ class TestPhasorDiagram_Smoke(unittest.TestCase):
             x = random.normalvariate(3, 1)
             if x < 0:
                 x = 0
-            d.update_data('ph-1', x, x+1)
-            d.update_data('ph-2', x, x+2)
-            d.update_data('ph-3', x, x+3)
+            d.update_data('ph-1', x, x + 1)
+            d.update_data('ph-2', x, x + 2)
+            d.update_data('ph-3', x, x + 3)
             d.set_range(x)
 
         timer = QtCore.QTimer()
@@ -191,38 +191,8 @@ class TestPhasorDiagram_Smoke(unittest.TestCase):
         app(d, ["No smoke"])
 
 
-class TestPhasorDiagram_Deprecation(unittest.TestCase):
-    def setUp(self):
-        TestApp(self)
-
-    def test_size_arg(self):
-        with self.assertWarns(FutureWarning):
-            PhasorDiagram(size=100)
-
-    def test_end_arg(self):
-        with self.assertWarns(FutureWarning):
-            PhasorDiagram(end='arrow')
-
-    def test_set_phasor_visible(self):
-        d = PhasorDiagram()
-        d.add_phasor(0)
-        with self.assertWarns(FutureWarning):
-            d.set_phasor_visible(0, False)
-
-    def test_update_phasor(self):
-        d = PhasorDiagram()
-        d.add_phasor(0)
-        with self.assertWarns(FutureWarning):
-            d.update_phasor(0, 1, 2)
-
-    def test_show_legend(self):
-        d = PhasorDiagram()
-        d.add_phasor(0)
-        with self.assertWarns(FutureWarning):
-            d.show_legend()
-
-
 class TestPhasorDiagramUI(unittest.TestCase):
+
     def setUp(self):
         self.app = TestApp(self)
 
@@ -243,10 +213,7 @@ class TestPhasorDiagramUI(unittest.TestCase):
         d.update_data(4, 1.2, 3)
         d.update_data(5, 1.1, 5)
 
-        self.app(d, ["Grid OK",
-                     "Legend OK",
-                     "3 U phasors",
-                     "3 I phasors"])
+        self.app(d, ["Grid OK", "Legend OK", "3 U phasors", "3 I phasors"])
 
     def test_only_u(self):
         d = PhasorDiagramUI()
@@ -254,8 +221,7 @@ class TestPhasorDiagramUI(unittest.TestCase):
         d.add_u(2, 'u2', color=(0, 255, 0), width=1)
         d.update_data(0, 220, 0)
         d.update_data(2, 230, 4)
-        self.app(d, ["Grid OK",
-                     "2 U phasors"])
+        self.app(d, ["Grid OK", "2 U phasors"])
 
     def test_only_i(self):
         d = PhasorDiagramUI()
@@ -263,8 +229,7 @@ class TestPhasorDiagramUI(unittest.TestCase):
         d.add_i(4, 'i0', color=(255, 0, 0), width=2)
         d.update_data(3, 1, 1)
         d.update_data(4, 1.2, 3)
-        self.app(d, ["Grid OK",
-                     "2 I phasors"])
+        self.app(d, ["Grid OK", "2 I phasors"])
 
     def test_repeat_key(self):
         d = PhasorDiagramUI()
@@ -287,8 +252,7 @@ class TestPhasorDiagramUI(unittest.TestCase):
         d.set_visible(2, False)
         d.set_visible(2, True)
 
-        self.app(d, ["Legend: u0, u1, u2",
-                     "2 U phasors"])
+        self.app(d, ["Legend: u0, u1, u2", "2 U phasors"])
 
     def test_remove_phasors(self):
         d = PhasorDiagramUI()
@@ -395,6 +359,7 @@ class TestPhasorDiagramUI(unittest.TestCase):
 
 
 class Test__linestyle_to_dash(unittest.TestCase):
+
     def test_unknown_style(self):
         with self.assertRaises(ValueError):
             _linestyle_to_dash('some unknown', 1)
