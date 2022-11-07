@@ -25,9 +25,12 @@ class TimeStampAxisItem(pg.AxisItem):
 
     def __init__(self, what_show='time', *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.enableAutoSIPrefix(enable=False)
+
         if what_show not in ['time', 'date']:
             raise ValueError("show must be 'time' or 'date'")
+
         self.what_show = what_show
 
     def tickStrings(self, values, scale, spacing):
@@ -35,10 +38,12 @@ class TimeStampAxisItem(pg.AxisItem):
             return [
                 time.strftime("%H:%M:%S", time.gmtime(secs)) for secs in values
             ]
+
         if self.what_show == 'date':
             return [
                 time.strftime("%y-%m-%d", time.gmtime(secs)) for secs in values
             ]
+
         raise RuntimeError("scale must be time or date")
 
 
@@ -48,6 +53,7 @@ def get_time_stamp_axis_item(top=True):
     res = {'bottom': TimeStampAxisItem(what_show='time', orientation='bottom')}
     if top:
         res['top'] = TimeStampAxisItem(what_show='date', orientation='top')
+
     return res
 
 
@@ -105,12 +111,16 @@ class Waveform(pg.PlotWidget):
         """Update plot."""
         if self.state['online'] and not self.isVisible():
             return
+
         if len(t) == 0:
             return
+
         self.curve.setData(t, x)
         self.setLimits(xMin=t[0], xMax=t[-1])
 
     def keyPressEvent(self, ev):
+        # pylint: disable=invalid-name
+
         if ev.key() == QtCore.Qt.Key_Shift:
             self.setMouseEnabled(x=False, y=True)
 
@@ -120,10 +130,14 @@ class Waveform(pg.PlotWidget):
         super().keyPressEvent(ev)
 
     def keyReleaseEvent(self, ev):
+        # pylint: disable=invalid-name
+
         self.setMouseEnabled(x=True, y=True)
         super().keyReleaseEvent(ev)
 
     def leaveEvent(self, ev):
+        # pylint: disable=invalid-name
+
         self.setMouseEnabled(x=True, y=True)
         super().leaveEvent(ev)
 
@@ -157,8 +171,9 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
 
     def _init_plot(self, key):
         """Bring plot to initial state."""
-        if key not in self.plots.keys():
+        if key not in self.plots:
             return
+
         plot = self.plots[key]
         plot.setDownsampling(mode='peak')
         plot.showGrid(x=True, y=True)
@@ -191,8 +206,9 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
 
     def remove_plots(self):
         """Remove all plots."""
-        for key in self.plots:
-            self.removeItem(self.plots[key])
+        for plot in self.plots.values():
+            self.removeItem(plot)
+
         self.plots = {}
         self.curves = {}
         self._main = None
@@ -201,6 +217,7 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
         """Update data on the plot."""
         if len(t) == 0:
             return
+
         if self.state['online'] and not self.isVisible():
             return
 
@@ -230,16 +247,20 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
         """Set color for all plots."""
         for curve in self.curves.values():
             curve.setPen(color)
+
         self.state['plot_color'] = color
 
     def set_link_to_main(self, value=True):
         """Link plots to main or unlink."""
-        for key in self.plots:
+        for key, plot in self.plots.items():
             if key == self._main:
                 continue
-            self.plots[key].setXLink(self.plots[self._main] if value else None)
+
+            plot.setXLink(self.plots[self._main] if value else None)
 
     def keyPressEvent(self, ev):
+        # pylint: disable=invalid-name
+
         if ev.key() == QtCore.Qt.Key_Shift:
             for plot in self.plots.values():
                 plot.setMouseEnabled(x=False, y=True)
@@ -251,11 +272,15 @@ class MultiWaveform(pg.GraphicsLayoutWidget):
         super().keyPressEvent(ev)
 
     def keyReleaseEvent(self, ev):
+        # pylint: disable=invalid-name
+
         for plot in self.plots.values():
             plot.setMouseEnabled(x=True, y=True)
         super().keyReleaseEvent(ev)
 
     def leaveEvent(self, ev):
+        # pylint: disable=invalid-name
+
         for plot in self.plots.values():
             plot.setMouseEnabled(x=True, y=True)
         super().leaveEvent(ev)

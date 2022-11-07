@@ -5,4 +5,4 @@ from pymuplot import __version__
 class TestInit(unittest.TestCase):
 
     def test_version(self):
-        self.assertEqual(__version__, "0.1.2")
+        self.assertEqual(__version__, "0.2.0")
