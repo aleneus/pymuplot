@@ -1,8 +1,10 @@
 flake8
-jedi
+mypy
 nose2
 nose2-cov
 pylint
+python-lsp-server[all]
 yapf
+
 pyqtest>=0.1.1
 pyqtgraph>=0.13.1
